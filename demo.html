@@ -1,0 +1,178 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrivePlayer Live Demo</title>
+<style>
+  /* Layout: one reading column; each section shows one way to place the same Drive video. */
+  :root {
+    --bg: #f5f6fa; --card: #ffffff; --text: #141824; --muted: #5b6477; --line: #e2e6ee;
+    --accent: #4f7cff; --ok: #12805c; --warn: #b25e09;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0c0f16; --card: #141924; --text: #e9ecf4; --muted: #9aa4bb; --line: #252c3b; --ok: #3ccf91; --warn: #f0a14a; color-scheme: dark; }
+  }
+  :root[data-theme="dark"] { --bg: #0c0f16; --card: #141924; --text: #e9ecf4; --muted: #9aa4bb; --line: #252c3b; --ok: #3ccf91; --warn: #f0a14a; color-scheme: dark; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 32px 16px 120px; display: grid; gap: 22px; }
+  h1 { font-size: clamp(26px, 5vw, 38px); line-height: 1.15; margin: 0; letter-spacing: -0.01em; text-wrap: balance; }
+  h2 { font-size: 18px; margin: 0 0 4px; }
+  p { margin: 0; }
+  .muted { color: var(--muted); }
+  a { color: var(--accent); }
+  section { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; display: grid; gap: 14px; min-width: 0; }
+  .label { font-size: 12px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); }
+  .status { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; font-size: 14px; }
+  .chip { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border-radius: 999px; border: 1px solid var(--line); font-weight: 600; }
+  .chip::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--muted); }
+  .chip.ok { color: var(--ok); } .chip.ok::before { background: var(--ok); }
+  .chip.warn { color: var(--warn); } .chip.warn::before { background: var(--warn); }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg);
+         color: var(--text); font: inherit; font-weight: 600; cursor: pointer; text-decoration: none; }
+  .btn.primary { background: var(--accent); color: #fff; border-color: transparent; }
+  .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .grid2 { grid-template-columns: 1fr; } }
+  .fake-dash { border: 1px dashed var(--line); border-radius: 12px; padding: 12px; display: grid; gap: 10px; }
+  .tile { background: var(--bg); border-radius: 10px; padding: 12px; }
+  .tile b { display: block; font-size: 22px; font-variant-numeric: tabular-nums; }
+  pre { margin: 0; background: #0f1320; color: #d8def0; border-radius: 12px; padding: 14px; overflow-x: auto; font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, monospace; }
+  input[type=text] { flex: 1; min-width: 0; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font: inherit; }
+  kbd { font: 600 12px ui-monospace, monospace; background: var(--bg); border: 1px solid var(--line); padding: 1px 6px; border-radius: 5px; }
+  ul { margin: 0; padding-left: 20px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header style="display:grid;gap:8px">
+    <div class="label">Live demo</div>
+    <h1>Your Google Drive video, four ways</h1>
+    <p class="muted">Every player on this page streams the same public Drive file. Scroll down to see it inline, as a closable card, in a popup, and as the floating tutorial in the bottom corner.</p>
+  </header>
+
+  <section>
+    <div class="status">
+      <span>Player engine:</span><span class="chip" id="engine">Waiting for you to press play</span>
+    </div>
+    <p class="muted" id="engineHelp">Press play on the first video. If Google allows direct streaming, you get the full custom controls. If not, the player switches to Google Drive's own player so the video still plays.</p>
+  </section>
+
+  <section>
+    <div class="label">1 · Inline</div>
+    <h2>Inside an article or guide</h2>
+    <drive-player id="main" data-video
+      title="My Drive video">
+    </drive-player>
+    <p class="muted">Try: <kbd>Space</kbd> play/pause, <kbd>J</kbd>/<kbd>L</kbd> skip 10s, <kbd>Shift</kbd>+<kbd>&gt;</kbd> faster, <kbd>F</kbd> full screen, <kbd>?</kbd> all shortcuts. The ⚙ menu has speed, loop, fill/fit and picture-in-picture.</p>
+  </section>
+
+  <section>
+    <div class="label">2 · Closable card</div>
+    <h2>A small tutorial box in a dashboard</h2>
+    <div class="fake-dash grid2">
+      <div style="display:grid;gap:10px;align-content:start">
+        <div class="tile"><span class="muted">Revenue</span><b>$48.2k</b></div>
+        <div class="tile"><span class="muted">Active users</span><b>3,912</b></div>
+      </div>
+      <drive-player data-video title="How to use this page" closable dismiss-key="demo-card"></drive-player>
+    </div>
+    <p class="muted">Close it with ✕. It stays closed after a reload. <button class="btn" id="resetCard" type="button">Show the card again</button></p>
+  </section>
+
+  <section>
+    <div class="label">3 · Popup</div>
+    <h2>Open from any button</h2>
+    <div class="row">
+      <button class="btn primary" type="button" id="popupBtn">▶ Watch in popup</button>
+      <button class="btn" type="button" id="popupBtn30">▶ Start at 0:30</button>
+    </div>
+    <p class="muted">Close with ✕, <kbd>Esc</kbd>, or a click outside the video.</p>
+  </section>
+
+  <section>
+    <div class="label">4 · Floating corner tutorial</div>
+    <h2>Look at the bottom-right corner</h2>
+    <ul class="muted">
+      <li>Drag the title bar to move it. It snaps to the nearest corner.</li>
+      <li><b>_</b> minimizes it, <b>⤢</b> makes it bigger, <b>✕</b> closes it.</li>
+      <li>After closing, a "Watch the tour" button stays so you can reopen it.</li>
+    </ul>
+    <div class="row"><button class="btn" type="button" data-drive-player-open="tour">Reopen the corner video</button></div>
+  </section>
+
+  <section>
+    <div class="label">Use it on your site</div>
+    <h2>The code for this video</h2>
+    <pre id="code"></pre>
+  </section>
+
+  <section>
+    <div class="label">Optional</div>
+    <h2>Custom controls for large files</h2>
+    <p class="muted">If the status above says "Google Drive player", Google didn't allow direct streaming of this file. A free Google API key with the Drive API enabled usually fixes that. Paste one here to test it. It is saved only in this browser.</p>
+    <div class="row">
+      <input type="text" id="apiKey" placeholder="AIza…" autocomplete="off" spellcheck="false">
+      <button class="btn" type="button" id="saveKey">Use key</button>
+    </div>
+  </section>
+</div>
+
+<drive-player id="tour" data-video mode="floating" title="Quick tour" launcher="Watch the tour" dismiss-key="demo-tour"></drive-player>
+
+<script src="drive-player.js"></script>
+<script>
+(function () {
+  var DEFAULT = 'https://drive.google.com/file/d/1xC6pV52BBr9H4lA6ocoPpwcs1D-PKtVb/view';
+  var params = new URLSearchParams(location.search);
+  var src = params.get('src') || DEFAULT;
+  var key = '';
+  try { key = localStorage.getItem('demo-api-key') || ''; } catch (e) {}
+  document.getElementById('apiKey').value = key;
+
+  document.querySelectorAll('[data-video]').forEach(function (p) {
+    if (key) p.setAttribute('api-key', key);
+    p.setAttribute('src', src);
+  });
+
+  function popup(start) {
+    DrivePlayer.open({ src: src, title: 'My Drive video', start: start, apiKey: key || null });
+  }
+  document.getElementById('popupBtn').onclick = function () { popup(null); };
+  document.getElementById('popupBtn30').onclick = function () { popup('30'); };
+
+  document.getElementById('resetCard').onclick = function () {
+    try { localStorage.removeItem('dp-dismissed:demo-card'); } catch (e) {}
+    var c = document.querySelector('[dismiss-key=demo-card]');
+    c.hidden = false;
+  };
+  document.getElementById('saveKey').onclick = function () {
+    try { localStorage.setItem('demo-api-key', document.getElementById('apiKey').value.trim()); } catch (e) {}
+    location.reload();
+  };
+
+  var chip = document.getElementById('engine'), help = document.getElementById('engineHelp');
+  document.addEventListener('dp:ready', function (e) {
+    if (e.target.id !== 'main') return;
+    chip.className = 'chip ok';
+    chip.textContent = 'Custom player (direct stream)';
+    help.textContent = 'Google streamed the file directly, so all custom controls are active: speed, chapters, skip, loop, picture-in-picture and keyboard shortcuts.';
+  });
+  document.addEventListener('dp:fallback', function (e) {
+    if (e.target.id !== 'main') return;
+    chip.className = 'chip warn';
+    chip.textContent = 'Google Drive player (fallback)';
+    help.textContent = 'Google didn’t allow direct streaming of this file here, so the player switched to Drive’s own player. The video still plays, and the card, popup and corner modes still work. Add an API key below to get the custom controls.';
+  });
+
+  var id = DrivePlayer.parseId(src) || src;
+  document.getElementById('code').textContent =
+    '<script src="drive-player.js"><\/script>\n\n' +
+    '<!-- inline -->\n<drive-player src="https://drive.google.com/file/d/' + id + '/view"\n  title="My Drive video"></drive-player>\n\n' +
+    '<!-- floating dashboard tutorial -->\n<drive-player mode="floating" src="https://drive.google.com/file/d/' + id + '/view"\n  title="Quick tour" launcher="Watch the tour" dismiss-key="tour-v1"></drive-player>\n\n' +
+    '<!-- popup button -->\n<button data-drive-src="https://drive.google.com/file/d/' + id + '/view">▶ Watch</button>';
+})();
+</script>
+</body>
+</html>

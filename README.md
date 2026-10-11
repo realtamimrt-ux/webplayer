@@ -14,6 +14,7 @@ Drop one script on any page and show a Drive video:
 ```
 
 Open `index.html` for a visual **embed builder**: paste a Drive link, pick a style and copy the code.
+Try it with a real Drive video: `demo.html` (add `?src=YOUR_DRIVE_LINK` for another one).
 Live demos: `examples/dashboard.html`, `examples/blog.html` and `examples/guide.html`. Add
 `?src=YOUR_DRIVE_LINK` to any demo URL to try your own video.
 
