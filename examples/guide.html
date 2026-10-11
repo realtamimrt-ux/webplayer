@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Guide Demo</title>
+<style>
+  :root { --bg: #f7f8fa; --card: #fff; --text: #16191f; --muted: #5f6878; --line: #e2e5eb; --accent: #0f9d58; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0d1013; --card: #151a20; --text: #e7eaef; --muted: #9aa3b2; --line: #252b34; }
+  }
+  :root[data-theme="dark"] { --bg: #0d1013; --card: #151a20; --text: #e7eaef; --muted: #9aa3b2; --line: #252b34; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 16px/1.6 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  .wrap { max-width: 860px; margin: 0 auto; padding: 36px 16px 80px; }
+  a { color: var(--accent); }
+  h1 { font-size: clamp(26px, 4.5vw, 36px); margin: 12px 0 6px; }
+  .lead { color: var(--muted); margin: 0 0 28px; }
+  .step { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 18px; margin-bottom: 14px; display: grid; grid-template-columns: 40px 1fr; gap: 14px; }
+  .num { width: 34px; height: 34px; border-radius: 50%; background: var(--accent); color: #fff; display: grid; place-items: center; font-weight: 700; }
+  .step h2 { font-size: 17px; margin: 4px 0 6px; }
+  .step p { margin: 0 0 10px; color: var(--muted); }
+  .watch { display: inline-flex; align-items: center; gap: 6px; font: inherit; font-size: 14px; font-weight: 600; padding: 7px 12px; border-radius: 999px;
+           border: 1px solid var(--line); background: var(--bg); color: var(--text); cursor: pointer; }
+  .watch:hover { border-color: var(--accent); }
+  drive-player { --dp-accent: var(--accent); }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 12px; }
+  @media (max-width: 640px) { .two { grid-template-columns: 1fr; } .step { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a href="../index.html">← DrivePlayer</a>
+  <h1>Setting up your account</h1>
+  <p class="lead">Each step has a short video. Click <b>Watch</b> to open it without leaving the guide.</p>
+
+  <div class="step">
+    <div class="num">1</div>
+    <div>
+      <h2>Create your workspace</h2>
+      <p>Pick a name and a URL. You can change both later in Settings.</p>
+      <button class="watch" data-drive-src="sample.mp4" data-title="Step 1 · Create your workspace">▶ Watch (0:20)</button>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">2</div>
+    <div>
+      <h2>Invite your team</h2>
+      <p>Send invites by email or share a join link.</p>
+      <button class="watch" data-drive-src="sample.mp4" data-start="20" data-title="Step 2 · Invite your team">▶ Watch (0:20)</button>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="num">3</div>
+    <div>
+      <h2>Connect your tools</h2>
+      <p>Two short clips, shown right here on the page:</p>
+      <div class="two">
+        <drive-player src="sample.mp4" title="Connect Slack" start="40"></drive-player>
+        <drive-player src="sample.mp4" title="Connect Google Calendar"></drive-player>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="../drive-player.js"></script>
+<script>
+  // Try your own video: guide.html?src=YOUR_DRIVE_LINK
+  var custom = new URLSearchParams(location.search).get('src');
+  if (custom) {
+    document.querySelectorAll('drive-player').forEach(function (p) { p.setAttribute('src', custom); });
+    document.querySelectorAll('[data-drive-src]').forEach(function (b) { b.setAttribute('data-drive-src', custom); });
+  }
+</script>
+</body>
+</html>

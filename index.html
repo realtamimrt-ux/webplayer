@@ -1,0 +1,284 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DrivePlayer</title>
+<meta name="description" content="A friendly video player for public Google Drive videos. Embed inline, as a floating dashboard tutorial, or in a lightbox.">
+<style>
+  :root {
+    --bg: #f6f7fb; --card: #ffffff; --text: #151924; --muted: #5b6477; --line: #e3e6ee;
+    --accent: #4f7cff; --accent-ink: #ffffff; --code: #0f1320; --code-text: #d8def0;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0c0f16; --card: #141924; --text: #e9ecf4; --muted: #9aa4bb; --line: #252c3b; --code: #0a0d14;
+    }
+  }
+  :root[data-theme="dark"] { --bg: #0c0f16; --card: #141924; --text: #e9ecf4; --muted: #9aa4bb; --line: #252c3b; --code: #0a0d14; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 15px/1.55 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  a { color: var(--accent); }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px; }
+  header { padding: 48px 0 24px; }
+  h1 { font-size: clamp(28px, 5vw, 44px); line-height: 1.1; margin: 0 0 12px; letter-spacing: -0.02em; }
+  .lead { color: var(--muted); font-size: 17px; max-width: 680px; margin: 0; }
+  .nav { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 16px; border-radius: 10px; font-weight: 600; text-decoration: none;
+         border: 1px solid var(--line); background: var(--card); color: var(--text); cursor: pointer; font: inherit; font-weight: 600; }
+  .btn.primary { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .grid { display: grid; grid-template-columns: minmax(0, 380px) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 860px) { .grid { grid-template-columns: 1fr; } }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 20px; }
+  .card h2 { font-size: 18px; margin: 0 0 14px; }
+  label { display: block; font-weight: 600; font-size: 13px; margin: 14px 0 6px; }
+  label:first-of-type { margin-top: 0; }
+  .hint { color: var(--muted); font-size: 12.5px; font-weight: 400; margin-top: 4px; }
+  input[type=text], textarea, select {
+    width: 100%; padding: 10px 12px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font: inherit; font-size: 14px;
+  }
+  textarea { min-height: 76px; resize: vertical; }
+  .seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+  .seg button { padding: 9px 6px; border-radius: 10px; border: 1px solid var(--line); background: var(--bg); color: var(--text); font: inherit; font-size: 13.5px; font-weight: 600; cursor: pointer; }
+  .seg button[aria-pressed="true"] { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin-top: 4px; }
+  .checks label { font-weight: 500; margin: 0; display: flex; gap: 8px; align-items: center; font-size: 13.5px; }
+  .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .preview { min-height: 200px; position: relative; }
+  .stage { border-radius: 12px; border: 1px dashed var(--line); padding: 16px; min-height: 260px; display: grid; place-items: center; text-align: center; color: var(--muted); }
+  .stage drive-player:not([mode]) , .stage drive-player[mode=inline] { width: 100%; }
+  pre { background: var(--code); color: var(--code-text); border-radius: 12px; padding: 16px; overflow: auto; font: 13px/1.55 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; margin: 0; white-space: pre-wrap; word-break: break-all; }
+  .code-head { display: flex; justify-content: space-between; align-items: center; margin: 18px 0 8px; }
+  .code-head h3 { margin: 0; font-size: 15px; }
+  .features { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin: 28px 0; }
+  .features .card h3 { margin: 0 0 6px; font-size: 15px; }
+  .features .card p { margin: 0; color: var(--muted); font-size: 14px; }
+  ol { padding-left: 20px; margin: 0; }
+  ol li { margin: 6px 0; }
+  .note { background: color-mix(in srgb, var(--accent) 10%, transparent); border: 1px solid color-mix(in srgb, var(--accent) 30%, transparent); padding: 12px 14px; border-radius: 12px; font-size: 14px; margin-top: 14px; }
+  footer { color: var(--muted); padding: 40px 0; font-size: 13px; }
+  .err { color: #e5484d; font-size: 12.5px; margin-top: 4px; min-height: 1em; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>DrivePlayer</h1>
+    <p class="lead">Play public Google Drive videos with a clean, easy player. Put it inside a blog post, open it in a lightbox from a guide, or pin it in a dashboard corner as a tutorial your users can close.</p>
+    <div class="nav">
+      <a class="btn primary" href="#builder">Build an embed</a>
+      <a class="btn" href="examples/dashboard.html">Dashboard demo</a>
+      <a class="btn" href="examples/blog.html">Blog demo</a>
+      <a class="btn" href="examples/guide.html">Guide demo</a>
+    </div>
+  </header>
+
+  <section id="builder" class="grid">
+    <div class="card">
+      <h2>1. Your video</h2>
+      <label for="src">Google Drive link</label>
+      <input id="src" type="text" placeholder="https://drive.google.com/file/d/…/view" autocomplete="off">
+      <div class="hint">Leave empty to try the built-in sample video.</div>
+      <div class="err" id="srcErr"></div>
+
+      <label for="heading">Title</label>
+      <input id="heading" type="text" value="Getting started tour">
+
+      <label>Display as</label>
+      <div class="seg" id="mode">
+        <button type="button" data-v="inline" aria-pressed="true">Inline</button>
+        <button type="button" data-v="floating" aria-pressed="false">Corner widget</button>
+        <button type="button" data-v="modal" aria-pressed="false">Lightbox</button>
+      </div>
+      <div class="hint" id="modeHint"></div>
+
+      <div id="floatOpts" hidden>
+        <div class="row2">
+          <div>
+            <label for="position">Corner</label>
+            <select id="position">
+              <option value="bottom-right">Bottom right</option>
+              <option value="bottom-left">Bottom left</option>
+              <option value="top-right">Top right</option>
+              <option value="top-left">Top left</option>
+            </select>
+          </div>
+          <div>
+            <label for="width">Width (px)</label>
+            <input id="width" type="text" value="380" inputmode="numeric">
+          </div>
+        </div>
+        <label for="launcher">Reopen button text</label>
+        <input id="launcher" type="text" placeholder="Watch: Getting started tour">
+      </div>
+
+      <label for="chapters">Chapters <span class="hint">(optional, one per line)</span></label>
+      <textarea id="chapters" placeholder="0:00 Welcome&#10;0:20 Create a project&#10;0:40 Invite your team">0:00 Welcome
+0:20 Create a project
+0:40 Invite your team</textarea>
+
+      <label>Options</label>
+      <div class="checks">
+        <label><input type="checkbox" id="optRemember" checked> Resume where left off</label>
+        <label><input type="checkbox" id="optLoop"> Loop</label>
+        <label><input type="checkbox" id="optAutoplay"> Autoplay (muted)</label>
+        <label><input type="checkbox" id="optDrive"> Use Drive's own player</label>
+      </div>
+
+      <label for="accent">Accent colour</label>
+      <input id="accent" type="color" value="#4f7cff" style="width:60px;height:36px;padding:2px;border-radius:8px;border:1px solid var(--line);background:var(--bg)">
+    </div>
+
+    <div class="card preview">
+      <h2>2. Preview</h2>
+      <div class="stage" id="stage"></div>
+      <div class="code-head">
+        <h3>3. Paste this into your site</h3>
+        <button class="btn" id="copy" type="button">Copy code</button>
+      </div>
+      <pre id="code"></pre>
+    </div>
+  </section>
+
+  <section class="features">
+    <div class="card"><h3>Basic controls</h3><p>Big play button, seek bar with buffering, time, volume, and full screen. Works with mouse, touch, and keyboard.</p></div>
+    <div class="card"><h3>Advanced controls</h3><p>Speed 0.25×–2×, ±10s skip, chapters with markers, loop, fill/fit, picture-in-picture, and keyboard shortcuts (press <b>?</b>).</p></div>
+    <div class="card"><h3>Dashboard tutorial widget</h3><p>Floating corner player you can drag, minimize, enlarge, and close. Once closed it stays closed and leaves a small "Watch" button.</p></div>
+    <div class="card"><h3>Remembers viewers</h3><p>Resumes where each viewer stopped, and keeps their volume. Nothing to set up.</p></div>
+    <div class="card"><h3>Mobile friendly</h3><p>Double-tap left or right to skip 10 seconds, tap to show controls, and the layout adapts to small widths.</p></div>
+    <div class="card"><h3>Never a dead player</h3><p>If Google won't stream a file directly, the player automatically switches to Google Drive's own player.</p></div>
+  </section>
+
+  <section class="grid" style="grid-template-columns:1fr 1fr">
+    <div class="card">
+      <h2>Make your Drive video public</h2>
+      <ol>
+        <li>Open the video in Google Drive and click <b>Share</b>.</li>
+        <li>Under <b>General access</b>, choose <b>Anyone with the link</b> (Viewer).</li>
+        <li>Click <b>Copy link</b> and paste it above.</li>
+      </ol>
+      <div class="note">For the most reliable custom player on big files, add a free Google API key with the Drive API enabled: <code>api-key="…"</code>. Without one, DrivePlayer streams directly when Google allows it and falls back to the Drive player when it doesn't.</div>
+    </div>
+    <div class="card">
+      <h2>Open from any button</h2>
+      <p style="margin-top:0;color:var(--muted)">Any element with <code>data-drive-src</code> opens the video in a lightbox. No extra code.</p>
+      <pre>&lt;button data-drive-src="DRIVE_LINK"
+        data-title="How to export"&gt;
+  ▶ Watch how
+&lt;/button&gt;</pre>
+      <p style="margin-bottom:0"><button class="btn primary" type="button" data-drive-src="examples/sample.mp4" data-title="Lightbox demo" data-chapters="0:00 Start; 0:30 Halfway">▶ Try it</button></p>
+    </div>
+  </section>
+
+  <footer>DrivePlayer · one file, no dependencies · <a href="README.md">Documentation</a></footer>
+</div>
+
+<script src="drive-player.js"></script>
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var SAMPLE = 'examples/sample.mp4';
+  var mode = 'inline';
+  var hints = {
+    inline: 'Sits inside your page, like an image. Great for blogs and guides.',
+    floating: 'Pinned to a corner of the screen. Users can drag, minimize, or close it.',
+    modal: 'Opens on top of the page when a button is clicked.'
+  };
+
+  $('mode').addEventListener('click', function (e) {
+    var b = e.target.closest('button');
+    if (!b) return;
+    mode = b.dataset.v;
+    [].forEach.call($('mode').children, function (x) { x.setAttribute('aria-pressed', x === b); });
+    render();
+  });
+  ['src', 'heading', 'chapters', 'position', 'width', 'launcher', 'accent'].forEach(function (id) { $(id).addEventListener('input', debounce(render, 300)); });
+  ['optRemember', 'optLoop', 'optAutoplay', 'optDrive'].forEach(function (id) { $(id).addEventListener('change', render); });
+
+  function debounce(fn, ms) { var t; return function () { clearTimeout(t); t = setTimeout(fn, ms); }; }
+  function escAttr(s) { return String(s).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;'); }
+
+  function attrs() {
+    var raw = $('src').value.trim();
+    var a = [];
+    var bad = raw && !DrivePlayer.parseId(raw);
+    $('srcErr').textContent = bad ? 'That doesn’t look like a Google Drive link. Use the "Copy link" URL from Drive.' : '';
+    var id = DrivePlayer.parseId(raw);
+    a.push(['src', id ? 'https://drive.google.com/file/d/' + id + '/view' : (raw && !bad ? raw : SAMPLE)]);
+    if ($('heading').value.trim()) a.push(['title', $('heading').value.trim()]);
+    if (mode !== 'inline') a.push(['mode', mode]);
+    if (mode === 'floating') {
+      if ($('position').value !== 'bottom-right') a.push(['position', $('position').value]);
+      a.push(['dismiss-key', 'tutorial-' + (id ? id.slice(0, 8) : 'demo')]);
+      if ($('launcher').value.trim()) a.push(['launcher', $('launcher').value.trim()]);
+    }
+    var ch = $('chapters').value.trim().split('\n').map(function (l) { return l.trim(); }).filter(Boolean).join('; ');
+    if (ch) a.push(['chapters', ch]);
+    if (!$('optRemember').checked) a.push(['remember', 'false']);
+    if ($('optLoop').checked) a.push(['loop', true]);
+    if ($('optAutoplay').checked) { a.push(['autoplay', true]); a.push(['muted', true]); }
+    if ($('optDrive').checked) a.push(['engine', 'drive']);
+    var style = [];
+    if ($('accent').value.toLowerCase() !== '#4f7cff') style.push('--dp-accent:' + $('accent').value);
+    var w = parseInt($('width').value, 10);
+    if (mode === 'floating' && w && w !== 380) style.push('--dp-width:' + w + 'px');
+    if (style.length) a.push(['style', style.join(';')]);
+    if (mode === 'modal') a.unshift(['id', 'tutorial']);
+    return a;
+  }
+
+  function render() {
+    $('floatOpts').hidden = mode !== 'floating';
+    $('modeHint').textContent = hints[mode];
+    var a = attrs();
+    var tag = '<drive-player' + a.map(function (p) {
+      return '\n  ' + p[0] + (p[1] === true ? '' : '="' + escAttr(p[1]) + '"');
+    }).join('') + '>\n</drive-player>';
+    var code = '<script src="drive-player.js"><\/script>\n\n' + tag;
+    if (mode === 'modal') code += '\n\n<button data-drive-player-open="tutorial">▶ Watch the tour</button>';
+    $('code').textContent = code;
+
+    // Live preview
+    var old = document.querySelector('drive-player[data-preview]');
+    if (old) old.remove();
+    var stage = $('stage');
+    stage.innerHTML = '';
+    var el = document.createElement('drive-player');
+    el.setAttribute('data-preview', '');
+    a.forEach(function (p) {
+      if (p[0] === 'id' || p[0] === 'dismiss-key') return; // keep the preview reopenable
+      el.setAttribute(p[0], p[1] === true ? '' : p[1]);
+    });
+    if (mode === 'floating') {
+      stage.innerHTML = '<p>The corner widget is showing in the <b>' + $('position').value.replace('-', ' ') + '</b> corner of this page.<br>Try dragging, minimizing, and closing it.</p>';
+      document.body.appendChild(el);
+    } else if (mode === 'modal') {
+      var b = document.createElement('button');
+      b.className = 'btn primary';
+      b.type = 'button';
+      b.textContent = '▶ Watch the tour';
+      b.onclick = function () { el.open(); };
+      stage.appendChild(b);
+      document.body.appendChild(el);
+    } else {
+      stage.appendChild(el);
+    }
+  }
+
+  $('copy').addEventListener('click', function () {
+    var t = $('code').textContent, b = this;
+    (navigator.clipboard ? navigator.clipboard.writeText(t) : Promise.reject()).then(function () {
+      b.textContent = 'Copied!';
+    }, function () {
+      var r = document.createRange(); r.selectNodeContents($('code'));
+      var s = getSelection(); s.removeAllRanges(); s.addRange(r);
+      b.textContent = 'Press Ctrl+C';
+    });
+    setTimeout(function () { b.textContent = 'Copy code'; }, 1600);
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>

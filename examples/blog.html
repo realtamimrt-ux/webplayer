@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Blog Demo</title>
+<style>
+  :root { --bg: #fffdf9; --text: #1d1b18; --muted: #6b655c; --line: #ece6dc; --accent: #d9480f; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #13110f; --text: #ece7df; --muted: #a39b8f; --line: #2a2622; }
+  }
+  :root[data-theme="dark"] { --bg: #13110f; --text: #ece7df; --muted: #a39b8f; --line: #2a2622; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 18px/1.7 Georgia, "Iowan Old Style", serif; }
+  article { max-width: 720px; margin: 0 auto; padding: 40px 16px 80px; }
+  .back { font: 14px system-ui, sans-serif; color: var(--muted); }
+  h1 { font-size: clamp(30px, 5vw, 42px); line-height: 1.15; margin: 18px 0 8px; }
+  .meta { color: var(--muted); font: 14px system-ui, sans-serif; margin-bottom: 28px; }
+  figure { margin: 32px 0; }
+  figcaption { color: var(--muted); font: 14px system-ui, sans-serif; margin-top: 10px; text-align: center; }
+  drive-player { --dp-accent: var(--accent); --dp-radius: 12px; }
+  blockquote { border-left: 3px solid var(--accent); margin: 28px 0; padding: 4px 0 4px 18px; color: var(--muted); font-style: italic; }
+  .inline-btn { font: 600 15px system-ui, sans-serif; background: none; border: 1px solid var(--line); color: var(--text); padding: 6px 12px; border-radius: 999px; cursor: pointer; }
+</style>
+</head>
+<body>
+<article>
+  <a class="back" href="../index.html">← DrivePlayer</a>
+  <h1>Five minutes to a cleaner kitchen workflow</h1>
+  <div class="meta">By the Team · 6 min read</div>
+
+  <p>We filmed the whole process so you can follow along. The video below lives in a public Google Drive folder — no YouTube channel, no ads, no recommendations pulling readers away.</p>
+
+  <figure>
+    <drive-player
+      src="sample.mp4"
+      title="The 5-minute reset"
+      chapters="0:00 Intro; 0:12 Clear the counters; 0:30 Wipe-down order; 0:48 Final check">
+    </drive-player>
+    <figcaption>Tip: press <b>?</b> on the video for keyboard shortcuts, or use the chapters to jump around.</figcaption>
+  </figure>
+
+  <p>Start with the counters. Everything that doesn't belong in the kitchen goes into one basket, which you'll sort later. This step alone usually takes under a minute.</p>
+
+  <blockquote>Short on time? <button class="inline-btn" data-drive-src="sample.mp4" data-start="30" data-title="Wipe-down order">▶ Watch just the wipe-down part</button></blockquote>
+
+  <p>Then work top to bottom: shelves, counters, stovetop, then floor. Gravity is on your side — crumbs fall down, so you never clean the same spot twice.</p>
+</article>
+
+<script src="../drive-player.js"></script>
+<script>
+  // Try your own video: blog.html?src=YOUR_DRIVE_LINK
+  var custom = new URLSearchParams(location.search).get('src');
+  if (custom) {
+    document.querySelectorAll('drive-player').forEach(function (p) { p.setAttribute('src', custom); });
+    document.querySelectorAll('[data-drive-src]').forEach(function (b) { b.setAttribute('data-drive-src', custom); });
+  }
+</script>
+</body>
+</html>

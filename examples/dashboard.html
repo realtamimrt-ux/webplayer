@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Dashboard Demo</title>
+<style>
+  :root { --bg: #f4f6fb; --panel: #fff; --text: #141824; --muted: #657088; --line: #e4e8f0; --accent: #4f7cff; --side: #121722; --side-text: #c4cbda; }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) { --bg: #0b0e14; --panel: #131823; --text: #e8ebf3; --muted: #95a0b6; --line: #232a39; --side: #0f131c; }
+  }
+  :root[data-theme="dark"] { --bg: #0b0e14; --panel: #131823; --text: #e8ebf3; --muted: #95a0b6; --line: #232a39; --side: #0f131c; }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; display: grid; grid-template-columns: 230px 1fr; min-height: 100vh; }
+  aside { background: var(--side); color: var(--side-text); padding: 20px 14px; }
+  aside .logo { color: #fff; font-weight: 700; font-size: 17px; padding: 0 10px 20px; }
+  aside a { display: block; color: inherit; text-decoration: none; padding: 9px 10px; border-radius: 8px; }
+  aside a.on, aside a:hover { background: rgba(255,255,255,.07); color: #fff; }
+  main { padding: 20px; min-width: 0; }
+  .top { display: flex; align-items: center; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+  .top h1 { font-size: 22px; margin: 0; flex: 1; }
+  .btn { padding: 9px 14px; border-radius: 10px; border: 1px solid var(--line); background: var(--panel); color: var(--text); font: inherit; font-weight: 600; cursor: pointer; }
+  .btn.primary { background: var(--accent); color: #fff; border-color: transparent; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 14px; margin-bottom: 18px; }
+  .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 14px; padding: 16px; }
+  .kpi .l { color: var(--muted); font-size: 13px; }
+  .kpi .v { font-size: 26px; font-weight: 700; margin-top: 4px; }
+  .cols { display: grid; grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); gap: 14px; align-items: start; }
+  @media (max-width: 900px) { body { grid-template-columns: 1fr; } aside { display: none; } .cols { grid-template-columns: 1fr; } }
+  h2 { font-size: 15px; margin: 0 0 12px; }
+  table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
+  td, th { text-align: left; padding: 9px 6px; border-bottom: 1px solid var(--line); }
+  th { color: var(--muted); font-weight: 600; }
+  .side-stack { display: grid; gap: 14px; }
+  .muted { color: var(--muted); }
+</style>
+</head>
+<body>
+<aside>
+  <div class="logo">◆ Acme Admin</div>
+  <a class="on" href="#">Overview</a><a href="#">Projects</a><a href="#">Customers</a><a href="#">Reports</a><a href="#">Settings</a>
+  <a href="../index.html" style="margin-top:20px">← Back to DrivePlayer</a>
+</aside>
+
+<main>
+  <div class="top">
+    <h1>Overview</h1>
+    <!-- Any button can reopen the floating tutorial -->
+    <button class="btn" data-drive-player-open="tour">❔ Watch the tour</button>
+    <button class="btn" id="reset" title="Clears the 'closed' memory so you can see the first-visit experience again">Reset demo</button>
+  </div>
+
+  <div class="kpis">
+    <div class="panel kpi"><div class="l">Revenue</div><div class="v">$48.2k</div></div>
+    <div class="panel kpi"><div class="l">Active users</div><div class="v">3,912</div></div>
+    <div class="panel kpi"><div class="l">Conversion</div><div class="v">4.7%</div></div>
+    <div class="panel kpi"><div class="l">Open tickets</div><div class="v">18</div></div>
+  </div>
+
+  <div class="cols">
+    <div class="panel">
+      <h2>Recent orders</h2>
+      <table>
+        <thead><tr><th>Order</th><th>Customer</th><th>Status</th><th>Total</th></tr></thead>
+        <tbody>
+          <tr><td>#1042</td><td>Nadia Rahman</td><td>Paid</td><td>$129</td></tr>
+          <tr><td>#1041</td><td>Leo Park</td><td>Pending</td><td>$58</td></tr>
+          <tr><td>#1040</td><td>Sam Ortiz</td><td>Paid</td><td>$310</td></tr>
+          <tr><td>#1039</td><td>Ama Mensah</td><td>Refunded</td><td>$42</td></tr>
+          <tr><td>#1038</td><td>Ivy Chen</td><td>Paid</td><td>$87</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="side-stack">
+      <!-- A small rectangular tutorial card inside the dashboard grid. Closable; stays closed. -->
+      <drive-player
+        src="sample.mp4"
+        title="How to read this report"
+        closable
+        dismiss-key="dash-report-card"
+        chapters="0:00 Revenue; 0:20 Users; 0:40 Tickets">
+      </drive-player>
+      <div class="panel">
+        <h2>Tips</h2>
+        <p class="muted" style="margin:0">The corner video is a <b>floating tutorial</b>. Drag it by its title bar, minimize it, make it bigger, or close it. After closing, a small "Watch" button stays in the corner, and it stays closed when you reload.</p>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- The floating corner tutorial -->
+<drive-player
+  id="tour"
+  mode="floating"
+  position="bottom-right"
+  src="sample.mp4"
+  title="Welcome! 1-minute dashboard tour"
+  launcher="Watch the tour"
+  dismiss-key="dash-tour-v1"
+  chapters="0:00 Welcome; 0:15 Your KPIs; 0:30 Orders; 0:45 Getting help">
+</drive-player>
+
+<script src="../drive-player.js"></script>
+<script>
+  // Try your own video: dashboard.html?src=YOUR_DRIVE_LINK
+  var custom = new URLSearchParams(location.search).get('src');
+  if (custom) document.querySelectorAll('drive-player').forEach(function (p) { p.setAttribute('src', custom); });
+
+  document.getElementById('reset').onclick = function () {
+    Object.keys(localStorage).filter(function (k) { return k.indexOf('dp-') === 0; }).forEach(function (k) { localStorage.removeItem(k); });
+    location.reload();
+  };
+</script>
+</body>
+</html>
